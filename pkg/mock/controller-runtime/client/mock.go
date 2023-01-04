@@ -14,6 +14,7 @@ type Client struct {
 	client.Reader
 	client.Writer
 	client.StatusClient
+	client.SubResourceClientConstructor
 	mock.Mock
 }
 
@@ -25,11 +26,15 @@ func (c *Client) RESTMapper() meta.RESTMapper {
 	panic("not implemented yet")
 }
 
-func (c *Client) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+func (c *Client) SubResource(subResource string) client.SubResourceClient {
+	panic("not implemented yet")
+}
+
+func (c *Client) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	called := c.Called(key, obj)
 	parent, ok := called.Get(0).(client.Client)
 	if ok {
-		return parent.Get(ctx, key, obj)
+		return parent.Get(ctx, key, obj, opts...)
 	}
 
 	return called.Error(0)
@@ -45,36 +50,46 @@ func (c *Client) List(ctx context.Context, list client.ObjectList, opts ...clien
 	return called.Error(0)
 }
 
-func (c *Client) Create(ctx context.Context, obj client.Object, options ...client.CreateOption) error {
-	called := c.Called(obj, options)
+func (c *Client) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+	called := c.Called(obj, opts)
 	parent, ok := called.Get(0).(client.Client)
 	if ok {
-		return parent.Create(ctx, obj, options...)
+		return parent.Create(ctx, obj, opts...)
 	}
 
 	return called.Error(0)
 }
 
-func (c *Client) Delete(ctx context.Context, obj client.Object, options ...client.DeleteOption) error {
-	called := c.Called(obj, options)
+func (c *Client) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+	called := c.Called(obj, opts)
 	parent, ok := called.Get(0).(client.Client)
 	if ok {
-		return parent.Delete(ctx, obj, options...)
+		return parent.Delete(ctx, obj, opts...)
 	}
 
 	return called.Error(0)
 }
 
-func (c *Client) Update(ctx context.Context, obj client.Object, options ...client.UpdateOption) error {
-	called := c.Called(obj, options)
+func (c *Client) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
+	called := c.Called(obj, opts)
 	parent, ok := called.Get(0).(client.Client)
 	if ok {
-		return parent.Update(ctx, obj, options...)
+		return parent.Update(ctx, obj, opts...)
 	}
 
 	return called.Error(0)
 }
 
-func (c *Client) Status() client.StatusWriter {
-	return c.Called().Get(0).(client.StatusWriter)
+func (c *Client) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
+	called := c.Called(obj, opts)
+	parent, ok := called.Get(0).(client.Client)
+	if ok {
+		return parent.Patch(ctx, obj, patch, opts...)
+	}
+
+	return called.Error(0)
+}
+
+func (c *Client) Status() client.SubResourceWriter {
+	return c.Called().Get(0).(client.SubResourceWriter)
 }

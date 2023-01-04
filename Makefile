@@ -9,11 +9,14 @@ help:  ## Display this help
 test: fmt vet  ## run unit tests
 	go test ./... -coverprofile=coverage.out `go list ./...`
 
+.PHONY: fmt
 fmt:  ## Run go fmt
 	go fmt ./...
 
+.PHONY: vet
 vet:  ## Run go vet
 	go vet ./...
 
+.PHONY: lint
 lint: ## Run go lint
 	golangci-lint run
